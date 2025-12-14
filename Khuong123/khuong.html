@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thiệp Mời Đặc Biệt</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Hiệu ứng nền động */
+        body::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: moveBackground 20s linear infinite;
+        }
+
+        @keyframes moveBackground {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+
+        .envelope-wrapper {
+            position: relative;
+            width: 90vw;
+            max-width: 350px;
+            height: 480px;
+            cursor: pointer;
+            z-index: 10;
+            transition: transform 0.3s ease;
+        }
+
+        .envelope-wrapper:active {
+            transform: scale(0.98);
+        }
+
+        #envelope {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+        }
+
+        .flap {
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-left: 50% solid transparent;
+            border-right: 50% solid transparent;
+            border-bottom: 160px solid #e74c6a;
+            top: 0;
+            left: 0;
+            right: 0;
+            transform-origin: top;
+            transition: transform 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            z-index: 10;
+            filter: drop-shadow(0 5px 15px rgba(0,0,0,0.3));
+        }
+
+        /* Thêm họa tiết trên nắp phong bì */
+        .flap::after {
+            content: '💌';
+            position: absolute;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 40px;
+            filter: drop-shadow(0 2px 5px rgba(0,0,0,0.2));
+        }
+
+        .pocket {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        /* Họa tiết trang trí trên phong bì */
+        .decoration {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0.2;
+        }
+
+        .decoration::before,
+        .decoration::after {
+            content: '❤️';
+            position: absolute;
+            font-size: 30px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .decoration::before {
+            top: 30px;
+            left: 30px;
+            animation-delay: 0s;
+        }
+
+        .decoration::after {
+            bottom: 30px;
+            right: 30px;
+            animation-delay: 1.5s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .letter {
+            position: absolute;
+            width: calc(100% - 30px);
+            height: calc(100% - 50px);
+            background: white;
+            top: 25px;
+            left: 15px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            transform: translateY(500px);
+            transition: transform 1s cubic-bezier(0.68, -0.55, 0.265, 1.55) 0.6s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            z-index: 5;
+            border: 3px solid #f5576c;
+        }
+
+        .letter-cover {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            z-index: 20;
+            transition: opacity 0.5s ease 1.4s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            padding: 10px;
+            text-align: center;
+        }
+
+        .letter-cover::before {
+            content: '✨';
+            font-size: 50px;
+            margin-bottom: 15px;
+            animation: spin 2s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .video-container {
+            width: 100%;
+            height: 100%;
+        }
+
+        iframe, video {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border: none;
+            border-radius: 8px;
+            background: #000;
+        }
+
+        .open .flap {
+            transform: rotateX(-180deg);
+        }
+
+        .open .letter {
+            transform: translateY(0);
+        }
+
+        .open .letter-cover {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .click-hint {
+            position: absolute;
+            bottom: -70px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 16px;
+            color: white;
+            animation: pulse 2s infinite;
+            white-space: nowrap;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+            font-weight: 600;
+            background: rgba(255,255,255,0.2);
+            padding: 10px 20px;
+            border-radius: 30px;
+            backdrop-filter: blur(10px);
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.6; transform: translateX(-50%) scale(1); }
+            50% { opacity: 1; transform: translateX(-50%) scale(1.05); }
+            100% { opacity: 0.6; transform: translateX(-50%) scale(1); }
+        }
+
+        /* Canvas cho pháo hoa */
+        #fireworksCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        /* Hiệu ứng lấp lánh */
+        .sparkle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: white;
+            border-radius: 50%;
+            animation: sparkleAnim 1s ease-out forwards;
+            pointer-events: none;
+            z-index: 999;
+        }
+
+        @keyframes sparkleAnim {
+            0% {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+            100% {
+                opacity: 0;
+                transform: scale(0) translateY(-50px);
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="fireworksCanvas"></canvas>
+    
+    <div class="envelope-wrapper">
+        <div id="envelope">
+            <div class="flap"></div>
+            <div class="pocket">
+                <div class="decoration"></div>
+            </div>
+            <div class="letter">
+                <div class="letter-cover">
+                    Thiệp Mời Đặc Biệt
+                </div>
+                
+                <div class="video-container">
+                    <video controls loop>
+                        <source src="Video đẳng cấp.mp4" type="video/mp4">
+                        Trình duyệt của bạn không hỗ trợ video.
+                    </video>
+                </div>
+            </div>
+        </div>
+        <div class="click-hint">👆 Nhấn vào để mở thiệp mời</div>
+    </div>
+
+    <script>
+        const envelope = document.getElementById('envelope');
+        const canvas = document.getElementById('fireworksCanvas');
+        const ctx = canvas.getContext('2d');
+        let clicked = false;
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+        // Class Particle cho pháo hoa
+        class Particle {
+            constructor(x, y, color) {
+                this.x = x;
+                this.y = y;
+                this.color = color;
+                this.velocity = {
+                    x: (Math.random() - 0.5) * 8,
+                    y: (Math.random() - 0.5) * 8
+                };
+                this.alpha = 1;
+                this.decay = Math.random() * 0.02 + 0.015;
+                this.radius = Math.random() * 3 + 1;
+            }
+
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = this.alpha;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+                ctx.restore();
+            }
+
+            update() {
+                this.velocity.y += 0.1;
+                this.x += this.velocity.x;
+                this.y += this.velocity.y;
+                this.alpha -= this.decay;
+            }
+        }
+
+        let particles = [];
+        const colors = ['#ff0844', '#ffb199', '#ffec91', '#00f5ff', '#a7ff83', '#f571ff'];
+
+        function createFirework(x, y) {
+            const particleCount = 80;
+            for (let i = 0; i < particleCount; i++) {
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                particles.push(new Particle(x, y, color));
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            particles.forEach((particle, index) => {
+                if (particle.alpha <= 0) {
+                    particles.splice(index, 1);
+                } else {
+                    particle.update();
+                    particle.draw();
+                }
+            });
+
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+
+        function createSparkles() {
+            for (let i = 0; i < 30; i++) {
+                setTimeout(() => {
+                    const sparkle = document.createElement('div');
+                    sparkle.className = 'sparkle';
+                    sparkle.style.left = Math.random() * window.innerWidth + 'px';
+                    sparkle.style.top = Math.random() * window.innerHeight + 'px';
+                    document.body.appendChild(sparkle);
+                    
+                    setTimeout(() => sparkle.remove(), 1000);
+                }, i * 50);
+            }
+        }
+
+        function launchFireworks() {
+            const fireworkCount = 15;
+            for (let i = 0; i < fireworkCount; i++) {
+                setTimeout(() => {
+                    const x = Math.random() * canvas.width;
+                    const y = Math.random() * canvas.height * 0.6;
+                    createFirework(x, y);
+                }, i * 300);
+            }
+        }
+
+        envelope.addEventListener('click', () => {
+            if (!clicked) {
+                envelope.classList.add('open');
+                clicked = true;
+                
+                // Tự động phát video với âm lượng 100% khi mở thư
+                const video = document.querySelector('video');
+                if (video) {
+                    setTimeout(() => {
+                        video.volume = 1.0; // Đặt âm lượng 100%
+                        video.play().catch(err => {
+                            console.log('Autoplay bị chặn:', err);
+                        });
+                    }, 1500);
+                }
+                
+                // Khởi động hiệu ứng pháo hoa
+                setTimeout(() => {
+                    launchFireworks();
+                    createSparkles();
+                }, 800);
+                
+                // Ẩn gợi ý click
+                document.querySelector('.click-hint').style.opacity = '0';
+            }
+        });
+    </script>
+</body>
+</html>
